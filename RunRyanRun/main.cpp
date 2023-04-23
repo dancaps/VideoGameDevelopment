@@ -13,34 +13,47 @@ int main()
 {
     // game setup variables
     const char gameTitle[15]{"Run Ryan, Run!"};
-    const int gameWidth{1500};
-    const int gameHeight{800};
+    int windowDimensions[2]{1500, 800};
 
     // window configuration
-    InitWindow(gameWidth, gameHeight, gameTitle);
+    InitWindow(windowDimensions[0], windowDimensions[1], gameTitle);
 
     // nebula setup
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
-    AnimationData nebulaAnimation = {
-        {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
-        {gameWidth, gameHeight - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
-        0, // frame initialization
-        1.0 / 12.0, // updateTime
-        0.0, // runningTime
+    // AnimationData nebulaAnimation = {
+    //     {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
+    //     {static_cast<float>(windowDimensions[0]), windowDimensions[1] - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
+    //     0, // frame initialization
+    //     1.0 / 12.0, // updateTime
+    //     0.0, // runningTime
+    // };
+    // AnimationData nebula2Animation = {
+    //     {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
+    //     {static_cast<float>(windowDimensions[0]) + windowDimensions[0] / 2, windowDimensions[1] - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
+    //     0, // frame initialization
+    //     1.0 / 18.0, // updateTime
+    //     0.0, // runningTime
+    // };
+
+    AnimationData nebulae[5]{};
+
+    for (int i = 0; i < 5; i++)
+    {
+        nebulae[i] = {
+            {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
+            {static_cast<float>(windowDimensions[0]) + (windowDimensions[0] / 2) * i, windowDimensions[1] - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
+            0, // frame initialization
+            1.0 / 18.0, // updateTime
+            0.0, // runningTime
     };
-    AnimationData nebula2Animation = {
-        {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
-        {gameWidth + gameWidth / 2, gameHeight - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
-        0, // frame initialization
-        1.0 / 18.0, // updateTime
-        0.0, // runningTime
-    };
+    }
+    
 
     // ryan setup
     Texture2D ryan = LoadTexture("textures/ryan.png");
     AnimationData ryanAnimation = {
         {0.0, 0.0, static_cast<float>(ryan.width / 6.0), static_cast<float>(ryan.height)},
-        {gameWidth / 3, gameHeight - static_cast<float>(ryan.height)}, 
+        {static_cast<float>(windowDimensions[0]) / 3, windowDimensions[1] - static_cast<float>(ryan.height)}, 
         0,
         1.0 / 12.0,
         0.0
@@ -66,11 +79,17 @@ int main()
 
         // stores the running time since the last reset
         ryanAnimation.runningTime += GetFrameTime();
-        nebulaAnimation.runningTime += GetFrameTime();
-        nebula2Animation.runningTime += GetFrameTime();
+
+        for (int i = 0; i < 5; i++)
+        {
+            nebulae[i].runningTime += GetFrameTime();
+        }
+        
+        // nebulae[0].runningTime += GetFrameTime();
+        // nebulae[1].runningTime += GetFrameTime();
 
         // ground check
-        if (ryanAnimation.pos.y < gameHeight - ryanAnimation.rec.height)
+        if (ryanAnimation.pos.y < windowDimensions[1] - ryanAnimation.rec.height)
         {
             // player in the air
             velocity += gravity * dT; // increases gravity using delta time
@@ -80,7 +99,7 @@ int main()
         {
             // player on the ground
             velocity = 0; // stops falling
-            ryanAnimation.pos.y = gameHeight - ryanAnimation.rec.height; // resets the postion to the ground
+            ryanAnimation.pos.y = windowDimensions[1] - ryanAnimation.rec.height; // resets the postion to the ground
             isInAir = false; // updates flag showing not in the air
         }
 
@@ -92,13 +111,24 @@ int main()
 
         // animation postion
         ryanAnimation.pos.y += velocity * dT;
-        nebulaAnimation.pos.x += nebulaVelocity * dT;
-        nebula2Animation.pos.x += nebulaVelocity * dT;
+
+        for (int i = 0; i < 5; i++)
+        {
+            nebulae[i].pos.x += nebulaVelocity * dT;
+        }
+        
+        // nebulae[0].pos.x += nebulaVelocity * dT;
+        // nebulae[1].pos.x += nebulaVelocity * dT;
 
         // update animation frame
-        nebulaAnimation.rec.x = nebulaAnimation.frame * nebulaAnimation.rec.width;
-        nebula2Animation.rec.x = nebula2Animation.frame * nebula2Animation.rec.width;
-        //nebulaRec.x = nebulaFrame * nebulaRec.width;
+
+        for (int i = 0; i < 5; i++)
+        {
+            nebulae[i].rec.x = nebulae[i].frame * nebulae[i].rec.width;
+        }
+        
+        // nebulae[0].rec.x = nebulae[0].frame * nebulae[0].rec.width;
+        // nebulae[1].rec.x = nebulae[1].frame * nebulae[1].rec.width;
 
         // ryan moving
         if (ryanAnimation.runningTime >= ryanAnimation.updateTime) 
@@ -121,38 +151,61 @@ int main()
             ryanAnimation.runningTime = 0.0;
         }
 
-        // first nebula
-        if (nebulaAnimation.runningTime >= nebulaAnimation.updateTime)
+        for (int i = 0; i < 5; i++)
         {
-            // time to update the nebula frame
-            nebulaAnimation.frame++;
-
-            if (nebulaAnimation.frame > 7)
+            // many nebula
+            if (nebulae[i].runningTime >= nebulae[i].updateTime)
             {
-                nebulaAnimation.frame = 0;
+                // time to update the nebula frame
+                nebulae[i].frame++;
+
+                if (nebulae[i].frame > 7)
+                {
+                    nebulae[i].frame = 0;
+                }
+
+                nebulae[i].runningTime = 0.0;
             }
-
-            nebulaAnimation.runningTime = 0.0;
         }
+        
+        // // first nebula
+        // if (nebulae[0].runningTime >= nebulae[0].updateTime)
+        // {
+        //     // time to update the nebula frame
+        //     nebulae[0].frame++;
 
-        // second nebula
-        if (nebula2Animation.runningTime >= nebula2Animation.updateTime)
-        {
-            // time to update the nebula frame
-            nebula2Animation.frame++;
+        //     if (nebulae[0].frame > 7)
+        //     {
+        //         nebulae[0].frame = 0;
+        //     }
 
-            if (nebula2Animation.frame > 7)
-            {
-                nebula2Animation.frame = 0;
-            }
+        //     nebulae[0].runningTime = 0.0;
+        // }
 
-            nebula2Animation.runningTime = 0.0;
-        }
+        // // second nebula
+        // if (nebulae[1].runningTime >= nebulae[1].updateTime)
+        // {
+        //     // time to update the nebula frame
+        //     nebulae[1].frame++;
+
+        //     if (nebulae[1].frame > 7)
+        //     {
+        //         nebulae[1].frame = 0;
+        //     }
+
+        //     nebulae[1].runningTime = 0.0;
+        // }
 
         // draw animations
         DrawTextureRec(ryan, ryanAnimation.rec, ryanAnimation.pos, WHITE);
-        DrawTextureRec(nebula, nebulaAnimation.rec, nebulaAnimation.pos, WHITE);
-        DrawTextureRec(nebula, nebula2Animation.rec, nebula2Animation.pos, RED);
+
+        for (int i = 0; i < 5; i++)
+        {
+            DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, WHITE);
+        }
+        
+        // DrawTextureRec(nebula, nebulae[0].rec, nebulae[0].pos, WHITE);
+        // DrawTextureRec(nebula, nebulae[1].rec, nebulae[1].pos, RED);
 
         // end drawing
         EndDrawing();
