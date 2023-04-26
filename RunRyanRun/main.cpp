@@ -87,33 +87,39 @@ int main()
         ClearBackground(WHITE);
 
         // drawing background
-        bgX -= 20 * dT;
+        bgX -= 40 * dT;
         if (bgX <= -background.width * backgroundScale)
         {
             bgX = 0.0;
         }
         Vector2 bg1Pos{bgX, 0.0};
-        DrawTextureEx(background, bg1Pos, 0.0, 4.5, WHITE);
-        Vector2 bg2Pos{static_cast<float>(bgX + background.width * 4.5), 0.0};
-        DrawTextureEx(background, bg2Pos, 0.0, 4.5, WHITE);
-        mgX -= 40 * dT;
+        DrawTextureEx(background, bg1Pos, 0.0, backgroundScale, WHITE);
+        Vector2 bg2Pos{static_cast<float>(bgX + background.width * backgroundScale), 0.0};
+        DrawTextureEx(background, bg2Pos, 0.0, backgroundScale, WHITE);
+        Vector2 bg3Pos{static_cast<float>(bgX + (background.width * 2) * backgroundScale), 0.0};
+        DrawTextureEx(background, bg3Pos, 0.0, backgroundScale, WHITE);
+
+        mgX -= 80 * dT;
         if (mgX <= -midground.width * backgroundScale)
         {
             mgX = 0.0;
         }
         Vector2 mg1Pos{mgX, 0.0};
-        DrawTextureEx(midground, mg1Pos, 0.0, 4.5, WHITE);
-        Vector2 mg2Pos{static_cast<float>(mgX + midground.width * 4.5), 0.0};
-        DrawTextureEx(midground, mg2Pos, 0.0, 4.5, WHITE);
-        fgX -= 80 * dT;
+        DrawTextureEx(midground, mg1Pos, 0.0, backgroundScale, WHITE);
+        Vector2 mg2Pos{static_cast<float>(mgX + midground.width * backgroundScale), 0.0};
+        DrawTextureEx(midground, mg2Pos, 0.0, backgroundScale, WHITE);
+        Vector2 mg3Pos{static_cast<float>(mgX + (midground.width * 2) * backgroundScale), 0.0};
+        DrawTextureEx(midground, mg3Pos, 0.0, backgroundScale, WHITE);
+        
+        fgX -= 160 * dT;
         if (fgX <= -foreground.width * backgroundScale)
         {
             fgX = 0.0;
         }
         Vector2 fg1Pos{fgX, 0.0};
-        DrawTextureEx(foreground, fg1Pos, 0.0, 4.5, WHITE);
-        Vector2 fg2Pos{static_cast<float>(fgX + foreground.width * 4.5), 0.0};
-        DrawTextureEx(foreground, fg2Pos, 0.0, 4.5, WHITE);
+        DrawTextureEx(foreground, fg1Pos, 0.0, backgroundScale, WHITE);
+        Vector2 fg2Pos{static_cast<float>(fgX + foreground.width * backgroundScale), 0.0};
+        DrawTextureEx(foreground, fg2Pos, 0.0, backgroundScale, WHITE);
 
         // stores the running time since the last reset
         ryanAnimation.runningTime += GetFrameTime();
