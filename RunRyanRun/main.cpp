@@ -20,24 +20,11 @@ int main()
 
     // nebula setup
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
-    // AnimationData nebulaAnimation = {
-    //     {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
-    //     {static_cast<float>(windowDimensions[0]), windowDimensions[1] - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
-    //     0, // frame initialization
-    //     1.0 / 12.0, // updateTime
-    //     0.0, // runningTime
-    // };
-    // AnimationData nebula2Animation = {
-    //     {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
-    //     {static_cast<float>(windowDimensions[0]) + windowDimensions[0] / 2, windowDimensions[1] - static_cast<float>(nebula.height / 8.0)}, // Vector2 data
-    //     0, // frame initialization
-    //     1.0 / 18.0, // updateTime
-    //     0.0, // runningTime
-    // };
+    const int sizeOfNebulae{5}; // size of the nebulae array
+    AnimationData nebulae[sizeOfNebulae]{}; // array to store the nebulae
 
-    AnimationData nebulae[5]{};
-
-    for (int i = 0; i < 5; i++)
+    // initializing the nebulae
+    for (int i = 0; i < sizeOfNebulae; i++)
     {
         nebulae[i] = {
             {0.0, 0.0, static_cast<float>(nebula.width / 8.0), static_cast<float>(nebula.height / 8.0)}, // Rectangle Data
@@ -48,7 +35,6 @@ int main()
     };
     }
     
-
     // ryan setup
     Texture2D ryan = LoadTexture("textures/ryan.png");
     AnimationData ryanAnimation = {
@@ -66,8 +52,10 @@ int main()
     const int gravity{4000}; // (pixels/sec)/sec
     const int nebulaVelocity{-500};
 
+    // sets the fps
     SetTargetFPS(120);
 
+    // running the game
     while (!WindowShouldClose()) 
     {
         // start drawing
@@ -80,13 +68,11 @@ int main()
         // stores the running time since the last reset
         ryanAnimation.runningTime += GetFrameTime();
 
-        for (int i = 0; i < 5; i++)
+        // counts the running time size the last frame update for nebulae
+        for (int i = 0; i < sizeOfNebulae; i++)
         {
             nebulae[i].runningTime += GetFrameTime();
         }
-        
-        // nebulae[0].runningTime += GetFrameTime();
-        // nebulae[1].runningTime += GetFrameTime();
 
         // ground check
         if (ryanAnimation.pos.y < windowDimensions[1] - ryanAnimation.rec.height)
@@ -112,23 +98,17 @@ int main()
         // animation postion
         ryanAnimation.pos.y += velocity * dT;
 
-        for (int i = 0; i < 5; i++)
+        // updates the nebulae postion with delta time, not frame refresh
+        for (int i = 0; i < sizeOfNebulae; i++)
         {
             nebulae[i].pos.x += nebulaVelocity * dT;
         }
-        
-        // nebulae[0].pos.x += nebulaVelocity * dT;
-        // nebulae[1].pos.x += nebulaVelocity * dT;
 
-        // update animation frame
-
-        for (int i = 0; i < 5; i++)
+        // updates the picture location on the sprite image
+        for (int i = 0; i < sizeOfNebulae; i++)
         {
             nebulae[i].rec.x = nebulae[i].frame * nebulae[i].rec.width;
         }
-        
-        // nebulae[0].rec.x = nebulae[0].frame * nebulae[0].rec.width;
-        // nebulae[1].rec.x = nebulae[1].frame * nebulae[1].rec.width;
 
         // ryan moving
         if (ryanAnimation.runningTime >= ryanAnimation.updateTime) 
@@ -151,7 +131,8 @@ int main()
             ryanAnimation.runningTime = 0.0;
         }
 
-        for (int i = 0; i < 5; i++)
+        // nebulae moving
+        for (int i = 0; i < sizeOfNebulae; i++)
         {
             // many nebula
             if (nebulae[i].runningTime >= nebulae[i].updateTime)
@@ -167,50 +148,21 @@ int main()
                 nebulae[i].runningTime = 0.0;
             }
         }
-        
-        // // first nebula
-        // if (nebulae[0].runningTime >= nebulae[0].updateTime)
-        // {
-        //     // time to update the nebula frame
-        //     nebulae[0].frame++;
 
-        //     if (nebulae[0].frame > 7)
-        //     {
-        //         nebulae[0].frame = 0;
-        //     }
-
-        //     nebulae[0].runningTime = 0.0;
-        // }
-
-        // // second nebula
-        // if (nebulae[1].runningTime >= nebulae[1].updateTime)
-        // {
-        //     // time to update the nebula frame
-        //     nebulae[1].frame++;
-
-        //     if (nebulae[1].frame > 7)
-        //     {
-        //         nebulae[1].frame = 0;
-        //     }
-
-        //     nebulae[1].runningTime = 0.0;
-        // }
-
-        // draw animations
+        // draw ryan
         DrawTextureRec(ryan, ryanAnimation.rec, ryanAnimation.pos, WHITE);
 
-        for (int i = 0; i < 5; i++)
+        // draw all the nebulae
+        for (int i = 0; i < sizeOfNebulae; i++)
         {
             DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, WHITE);
         }
-        
-        // DrawTextureRec(nebula, nebulae[0].rec, nebulae[0].pos, WHITE);
-        // DrawTextureRec(nebula, nebulae[1].rec, nebulae[1].pos, RED);
 
         // end drawing
         EndDrawing();
     }
 
+    // cleanup
     UnloadTexture(ryan);
     UnloadTexture(nebula);
     CloseWindow();
